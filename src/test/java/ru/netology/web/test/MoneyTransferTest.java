@@ -76,12 +76,24 @@ class MoneyTransferTest {
         val transferInfo = DataHelper.getSecondCard();
         int sum = 0;
         moneyTransferPage.submitTransfer(sum, transferInfo);
-        int balanceReplenishedCard = DataHelper.checkBalanceRechargeCard(balanceFirstCardBeforeReplenish, sum);
-        int balanceDebitingCard = DataHelper.checkBalanceDebitCard(balanceSecondCardBeforeReplenish, sum);
-        int balanceFirstCardAfterReplenish = DashboardPage.getFirstCardBalance();
-        int balanceSecondCardAfterReplenish = DashboardPage.getSecondCardBalance();
-        assertEquals(balanceReplenishedCard, balanceFirstCardAfterReplenish);
-        assertEquals(balanceDebitingCard, balanceSecondCardAfterReplenish);
+        dashboardPage.getError();
+    }
+
+    @Test
+    @DisplayName("Карта списания равна карте пополнения")
+    void debitCardEqualCreditCard() {
+        val loginPage = new LoginPage();
+        val authInfo = DataHelper.getAuthInfo();
+        val verificationPage = loginPage.validLogin(authInfo);
+        val verificationCode = DataHelper.getVerificationCode(authInfo);
+        val dashboardPage = verificationPage.validVerify(verificationCode);
+        int balanceFirstCardBeforeReplenish = DashboardPage.getFirstCardBalance();
+        int balanceSecondCardBeforeReplenish = DashboardPage.getFirstCardBalance();
+        val moneyTransferPage = dashboardPage.replenishFirstCard();
+        val transferInfo = DataHelper.getFirstCard();
+        int sum = 1;
+        moneyTransferPage.submitTransfer(sum, transferInfo);
+        dashboardPage.getError();
     }
 
     @Test
@@ -92,11 +104,9 @@ class MoneyTransferTest {
         val verificationPage = loginPage.validLogin(authInfo);
         val verificationCode = DataHelper.getVerificationCode(authInfo);
         val dashboardPage = verificationPage.validVerify(verificationCode);
-        int balanceFirstCardBeforeReplenish = DashboardPage.getFirstCardBalance();
-        int balanceSecondCardBeforeReplenish = DashboardPage.getSecondCardBalance();
+        int sum = DashboardPage.getSecondCardBalance() + 1;
         val moneyTransferPage = dashboardPage.replenishFirstCard();
         val transferInfo = DataHelper.getSecondCard();
-        int sum = DashboardPage.getSecondCardBalance() + 1;
         moneyTransferPage.submitTransfer(sum, transferInfo);
         dashboardPage.getError();
     }
